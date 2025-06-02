@@ -24,3 +24,13 @@ func (r TaskRequest) ToDomainModel() (interface{}, error) {
 		Date:        &date,
 	}, nil
 }
+
+type UpdateTaskRequest struct {
+	Status domain.TaskStatus `json:"status" validate:"required,oneof=NEW IN_PROGRESS COMPLETE"`
+}
+
+func (r UpdateTaskRequest) ToDomainModel() (interface{}, error) {
+	return domain.Task{
+		Status: r.Status,
+	}, nil
+}

@@ -1,24 +1,43 @@
-# Binaries for programs and plugins
+# ===== Go Build Files =====
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-
-# Test binary, built with `go test -c`
 *.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Go workspace files
+bin/
+pkg/
+*.log
 
-# Go workspace file
-go.work
+# ===== Go Modules =====
+vendor/
 
-# Custom ignores
-.idea
-.vscode
+# ===== IDE / Editor Files =====
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (GoLand, IntelliJ, etc.)
+.idea/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# ===== OS / System Files =====
+.DS_Store
+Thumbs.db
+
+# ===== Git =====
+.git/
+.gitignore~
+
+# ===== Other =====
 .env
-/file_storage/
+.env.*
+*.local
+*.swp

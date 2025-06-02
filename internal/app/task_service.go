@@ -65,6 +65,21 @@ func (s taskService) Update(t domain.Task) (domain.Task, error) {
 	return task, nil
 }
 
+func (s taskService) UpdateStatus(id uint64, status domain.TaskStatus) (domain.Task, error) {
+	task, err := s.taskRepo.Find(id)
+	if err != nil {
+		log.Printf("taskService.UpdateStatus(s.taskRepo.Find): %s", err)
+		return domain.Task{}, err
+	}
+	task.Status = status
+	task, err = s.taskRepo.Update(task)
+	if err != nil {
+		log.Printf("taskService.UpdateStatus(s.taskRepo.Update): %s", err)
+		return domain.Task{}, err
+	}
+	return task, nil
+}
+
 func (s taskService) Delete(id uint64) error {
 	err := s.taskRepo.Delete(id)
 	if err != nil {
