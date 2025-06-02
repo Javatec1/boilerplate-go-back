@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"log"
 	"net/http"
 
@@ -50,14 +49,6 @@ func (c TaskController) Save() http.HandlerFunc {
 func (c TaskController) Find() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		task := r.Context().Value(TaskKey).(domain.Task)
-		user := r.Context().Value(UserKey).(domain.User)
-
-		if task.UserId != user.Id {
-			err := errors.New("access denied")
-			Forbidden(w, err)
-			return
-		}
-
 		var taskDto resources.TaskDto
 		taskDto = taskDto.DomainToDto(task)
 		Success(w, taskDto)
@@ -90,14 +81,7 @@ func (c TaskController) Update() http.HandlerFunc {
 			return
 		}
 
-		user := r.Context().Value(UserKey).(domain.User)
 		taskExists := r.Context().Value(TaskKey).(domain.Task)
-		if taskExists.UserId != user.Id {
-			err = errors.New("access denied")
-			Forbidden(w, err)
-			return
-		}
-
 		taskExists.Title = task.Title
 		taskExists.Description = task.Description
 		taskExists.Date = task.Date
@@ -124,15 +108,7 @@ func (c TaskController) UpdateStatus() http.HandlerFunc {
 			return
 		}
 
-		user := r.Context().Value(UserKey).(domain.User)
 		taskExists := r.Context().Value(TaskKey).(domain.Task)
-		if taskExists.UserId != user.Id {
-			err = errors.New("access denied")
-			log.Printf("TaskController.UpdateStatus: %s", err.Error())
-			Forbidden(w, err)
-			return
-		}
-
 		taskExists.Status = task.Status
 
 		updatedTask, err := c.taskService.UpdateStatus(taskExists.Id, taskExists.Status)
@@ -151,21 +127,12 @@ func (c TaskController) UpdateStatus() http.HandlerFunc {
 func (c TaskController) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		task := r.Context().Value(TaskKey).(domain.Task)
-		user := r.Context().Value(UserKey).(domain.User)
-
-		if task.UserId != user.Id {
-			err := errors.New("access denied")
-			Forbidden(w, err)
-			return
-		}
-
 		err := c.taskService.Delete(task.Id)
 		if err != nil {
 			log.Printf("TaskController: %s", err)
 			InternalServerError(w, err)
 			return
 		}
-
 		noContent(w)
 	}
 }
