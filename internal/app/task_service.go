@@ -12,6 +12,7 @@ type TaskService interface {
 	Find(id uint64) (interface{}, error)
 	FindAll(uId uint64) ([]domain.Task, error)
 	Update(t domain.Task) (domain.Task, error)
+	UpdateStatus(id uint64, status domain.TaskStatus) (domain.Task, error)
 	Delete(id uint64) error
 }
 

@@ -115,6 +115,39 @@ func (c TaskController) Update() http.HandlerFunc {
 	}
 }
 
+func (c TaskController) UpdateStatus() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		task, err := requests.Bind(r, requests.UpdateTaskRequest{}, domain.Task{})
+		if err != nil {
+			log.Printf("TaskController.UpdateStatus: %s", err.Error())
+			BadRequest(w, err)
+			return
+		}
+
+		user := r.Context().Value(UserKey).(domain.User)
+		taskExists := r.Context().Value(TaskKey).(domain.Task)
+		if taskExists.UserId != user.Id {
+			err = errors.New("access denied")
+			log.Printf("TaskController.UpdateStatus: %s", err.Error())
+			Forbidden(w, err)
+			return
+		}
+
+		taskExists.Status = task.Status
+
+		updatedTask, err := c.taskService.UpdateStatus(taskExists.Id, taskExists.Status)
+		if err != nil {
+			log.Printf("TaskController.UpdateStatus: %s", err.Error())
+			InternalServerError(w, err)
+			return
+		}
+
+		var taskDto resources.TaskDto
+		taskDto = taskDto.DomainToDto(updatedTask)
+		Success(w, taskDto)
+	}
+}
+
 func (c TaskController) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		task := r.Context().Value(TaskKey).(domain.Task)

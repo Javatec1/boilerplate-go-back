@@ -120,6 +120,10 @@ func TaskRouter(r chi.Router, tc controllers.TaskController, ts app.TaskService)
 			tc.Find(),
 		)
 		apiRouter.With(tpom).Put(
+			"/{taskId}/status",
+			tc.UpdateStatus(),
+		)
+		apiRouter.With(tpom).Put(
 			"/{taskId}",
 			tc.Update(),
 		)
