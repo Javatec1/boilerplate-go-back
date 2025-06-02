@@ -14,9 +14,8 @@ import (
 	"github.com/Javatec1/boilerplate-go-back/internal/infra/http/controllers"
 	"github.com/Javatec1/boilerplate-go-back/internal/infra/http/middlewares"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
-
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 func Router(cont container.Container) http.Handler {
@@ -105,32 +104,15 @@ func UserRouter(r chi.Router, uc controllers.UserController) {
 }
 
 func TaskRouter(r chi.Router, tc controllers.TaskController, ts app.TaskService) {
-	tpom := middlewares.PathObject("taskId", controllers.TaskKey, ts)
+	fmt.Print("TaskRoute")
+	ownershipMw := middlewares.TaskOwnershipMiddleware(ts) // Додаємо middleware
 	r.Route("/tasks", func(apiRouter chi.Router) {
-		apiRouter.Post(
-			"/",
-			tc.Save(),
-		)
-		apiRouter.Get(
-			"/",
-			tc.FindAll(),
-		)
-		apiRouter.With(tpom).Get(
-			"/{taskId}",
-			tc.Find(),
-		)
-		apiRouter.With(tpom).Put(
-			"/{taskId}/status",
-			tc.UpdateStatus(),
-		)
-		apiRouter.With(tpom).Put(
-			"/{taskId}",
-			tc.Update(),
-		)
-		apiRouter.With(tpom).Delete(
-			"/{taskId}",
-			tc.Delete(),
-		)
+		apiRouter.Post("/", tc.Save())
+		apiRouter.Get("/", tc.FindAll())
+		apiRouter.With(ownershipMw).Get("/{taskId}", tc.Find()) // Застосовуємо middleware
+		apiRouter.With(ownershipMw).Put("/{taskId}/status", tc.UpdateStatus())
+		apiRouter.With(ownershipMw).Put("/{taskId}", tc.Update())
+		apiRouter.With(ownershipMw).Delete("/{taskId}", tc.Delete())
 	})
 }
 
